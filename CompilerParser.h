@@ -38,7 +38,7 @@ class CompilerParser {
         private:
         std::list<Token*> tokenList;
         std::list<Token*>::iterator tokenIterator;
-        ParseTree* compileSubroutineCall();
+        ParseTree* compileSubroutineCall;
 };
 
 class ParseException : public std::exception {

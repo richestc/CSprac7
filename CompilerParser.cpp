@@ -21,26 +21,24 @@ ParseTree* CompilerParser::compileProgram() {
  * @return a ParseTree
  */
 ParseTree* CompilerParser::compileClass() {
-    // Example implementation for parsing a class
     ParseTree* classNode = new ParseTree("Class", "");
 
-    mustBe("Keyword", "class"); // Check if the current token is "class"
-    Token* className = mustBe("Identifier", ""); // Get the class name
-    mustBe("Symbol", "{"); // Check if the current token is "{"
+    // 'class' className '{' classVarDec* subroutineDec* '}'
+    mustBe("Keyword", "class");
+    mustBe("Identifier", ""); // Ignore the class name for now
+    mustBe("Symbol", "{");
 
-    // Parse classVarDec if present
+    // Class variable declarations
     while (have("Keyword", "static") || have("Keyword", "field")) {
-        ParseTree* classVarDecNode = compileClassVarDec();
-        classNode->addChild(classVarDecNode);
+        classNode->addChild(compileClassVarDec());
     }
 
-    // Parse subroutineDec if present
+    // Subroutine declarations
     while (have("Keyword", "constructor") || have("Keyword", "function") || have("Keyword", "method")) {
-        ParseTree* subroutineDecNode = compileSubroutine();
-        classNode->addChild(subroutineDecNode);
+        classNode->addChild(compileSubroutine());
     }
 
-    mustBe("Symbol", "}"); // Check if the current token is "}"
+    mustBe("Symbol", "}");
 
     return classNode;
 }
@@ -85,35 +83,18 @@ ParseTree* CompilerParser::compileClassVarDec() {
  * @return a ParseTree
  */
 ParseTree* CompilerParser::compileSubroutine() {
-    // Example implementation for parsing a subroutine
     ParseTree* subroutineNode = new ParseTree("Subroutine", "");
 
-    // Parse constructor, function, or method
-    if (have("Keyword", "constructor")) {
-        mustBe("Keyword", "constructor");
-    } else if (have("Keyword", "function")) {
-        mustBe("Keyword", "function");
-    } else if (have("Keyword", "method")) {
-        mustBe("Keyword", "method");
-    }
+    // ('constructor' | 'function' | 'method')
+    mustBe("Keyword", "constructor");
+    // Remove unused variable declaration: Token* returnType = mustBe("Identifier", "");
 
-    // Parse return type
-    Token* returnType = mustBe("Identifier", ""); // Assuming return type is an identifier
+    // Remove unused variable declaration: Token* subroutineName = mustBe("Identifier", "");
 
-    // Parse subroutine name
-    Token* subroutineName = mustBe("Identifier", "");
-
-    mustBe("Symbol", "("); // Check if the current token is "("
-
-    // Parse parameter list
-    ParseTree* parameterListNode = compileParameterList();
-    subroutineNode->addChild(parameterListNode);
-
-    mustBe("Symbol", ")"); // Check if the current token is ")"
-
-    // Parse subroutine body
-    ParseTree* subroutineBodyNode = compileSubroutineBody();
-    subroutineNode->addChild(subroutineBodyNode);
+    mustBe("Symbol", "(");
+    subroutineNode->addChild(compileParameterList());
+    mustBe("Symbol", ")");
+    subroutineNode->addChild(compileSubroutineBody());
 
     return subroutineNode;
 }
@@ -353,7 +334,7 @@ ParseTree* CompilerParser::compileDo() {
     mustBe("Keyword", "do"); // Check if the current token is "do"
 
     // Parse subroutine call
-    ParseTree* subroutineCallNode = compileSubroutineCall();
+    ParseTree* subroutineCallNode = compileSubroutineCall;
     doStatementNode->addChild(subroutineCallNode);
 
     mustBe("Symbol", ";"); // Check if the current token is ";"
@@ -432,7 +413,7 @@ ParseTree* CompilerParser::compileTerm() {
             mustBe("Symbol", "]");
         } else if (have("Symbol", "(") || have("Symbol", ".")) {
             // Parse a subroutine call
-            termNode->addChild(compileSubroutineCall());
+            termNode->addChild(compileSubroutineCall);
         } else {
             // Parse a variable reference
             termNode->addChild(new ParseTree("VariableReference", ""));
