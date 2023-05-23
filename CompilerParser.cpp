@@ -21,26 +21,66 @@ ParseTree* CompilerParser::compileProgram() {
  * @return a ParseTree
  */
 ParseTree* CompilerParser::compileClass() {
-    ParseTree* classNode = new ParseTree("Class", "");
+        // 'class' className '{' classVarDec* subroutokenListeDec* '}'
+    ParseTree* compClass = new ParseTree("class","");
 
-    // 'class' className '{' classVarDec* subroutineDec* '}'
-    mustBe("Keyword", "class");
-    mustBe("Identifier", ""); // Ignore the class name for now
-    mustBe("Symbol", "{");
-
-    // Class variable declarations
-    while (have("Keyword", "static") || have("Keyword", "field")) {
-        classNode->addChild(compileClassVarDec());
+        //adding class
+    if(tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "class"){
+            ParseTree* temp = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
+            compClass->addChild(temp);
+            tokenList.erase(tokenList.begin());
+    }
+    else{
+        throw ParseException();
     }
 
-    // Subroutine declarations
-    while (have("Keyword", "constructor") || have("Keyword", "function") || have("Keyword", "method")) {
-        classNode->addChild(compileSubroutine());
+    //adding className
+    if(tokenList.front()->getType() == "identifier"){
+            ParseTree* temp1 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
+            compClass->addChild(temp1);
+            tokenList.erase(tokenList.begin());
+    }
+    else{
+        throw ParseException();
+    }
+//adding {
+    if(tokenList.front()->getType() == "symbol" && tokenList.front()->getValue() == "{"){
+            ParseTree* temp2 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
+            compClass->addChild(temp2);
+            tokenList.erase(tokenList.begin());
+    }
+    else{
+        throw ParseException();
     }
 
-    mustBe("Symbol", "}");
+    while(tokenList.front()->getValue() != "}" && (tokenList.size() > 0)){
 
-    return classNode;
+        //next will be either classVarDec or subroutokenListe
+        if( tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "static" ||
+            tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "field"){
+            
+            compClass->addChild(compileClassVarDec());
+        }
+        else if( (tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "constructor") ||
+                (tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "function") ||
+                (tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "method")){
+                    compClass->addChild(compileSubroutine());
+                }
+        else if(tokenList.front()->getType() != "symbol" && tokenList.front()->getValue() != "}"){
+            //throw std::invalid_argument( "Error in parsing: 04" + tokenList.front()->getType() + "  " + tokenList.front()->getValue());
+            throw ParseException();
+        }
+    }
+
+    if(tokenList.front()->getType() == "symbol" && tokenList.front()->getValue() == "}"){
+        ParseTree* temp3 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
+        compClass->addChild(temp3);
+        tokenList.erase(tokenList.begin());
+    }
+    else{
+        throw ParseException();
+    }
+    return compClass;
 }
 
 /**
