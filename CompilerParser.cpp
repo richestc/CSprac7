@@ -13,7 +13,7 @@ CompilerParser::CompilerParser(std::list<Token*> tokens) {
  * @return a ParseTree
  */
 ParseTree* CompilerParser::compileProgram() {
-    return compileClass();
+    return NULL;
 }
 
 /**
@@ -21,69 +21,7 @@ ParseTree* CompilerParser::compileProgram() {
  * @return a ParseTree
  */
 ParseTree* CompilerParser::compileClass() {
-    // 'class' className '{' classVarDec* subroutokenListeDec* '}'
-
-    ParseTree* compileClass = new ParseTree("compileClass","");
-
-    //adding class
-    if(tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "class"){
-            ParseTree* temp1 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
-            compileClass->addChild(temp1);
-            tokenList.erase(tokenList.begin());
-    }
-    else{
-        throw ParseException(); //parseError
-    }
-
-    //adding className
-    if(tokenList.front()->getType() == "identifier"){
-            ParseTree* temp2 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
-            compileClass->addChild(temp2);
-            tokenList.erase(tokenList.begin());
-    }
-    else{
-        throw ParseException();
-    }
-
-    //adding {
-    if(tokenList.front()->getType() == "symbol" && tokenList.front()->getValue() == "{"){
-            ParseTree* temp3 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
-            compileClass->addChild(temp3);
-            tokenList.erase(tokenList.begin());
-    }
-    else{
-        throw ParseException();
-    }
-
-    //adding classVarDec* or subRoutineDec* --> while loop due to '*'
-    while(tokenList.front()->getValue() != "}" && (tokenList.size() > 0)){
-
-        //classVarDec*
-        if( tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "static" ||
-            tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "field"){
-            compileClass->addChild(compileClassVarDec());
-        }
-        //subRoutineDec*
-        else if( (tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "constructor") ||
-                (tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "function") ||
-                (tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "method")){
-                    compileClass->addChild(compileSubroutine());
-                }
-        else if(tokenList.front()->getType() != "symbol" && tokenList.front()->getValue() != "}"){
-            throw ParseException();
-        }
-    }
-
-    //adding }
-    if(tokenList.front()->getType() == "symbol" && tokenList.front()->getValue() == "}"){
-        ParseTree* temp3 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
-        compileClass->addChild(temp3);
-        tokenList.erase(tokenList.begin());
-    }
-    else{
-        throw ParseException();
-    }
-    return compileClass;
+    return NULL;
 }
 
 /**
@@ -91,67 +29,7 @@ ParseTree* CompilerParser::compileClass() {
  * @return a ParseTree
  */
 ParseTree* CompilerParser::compileClassVarDec() {
-    // ('static'|'field') type varName(',' varName)*';'
-
-    ParseTree* compileClassVarDec = new ParseTree("compileClassVarDec","");
-
-    //add static or field
-    if(tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "static")
-        ||(tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "field"){
-            ParseTree* temp1 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
-            compileClassVarDec->addChild(temp1);
-            tokenList.erase(tokenList.begin());
-    }
-    else{
-        throw ParseException(); //parseError
-    }
-    
-    //add type
-    if( tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "int" 
-    || tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "char" 
-    || tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "boolean" 
-    || tokenList.front()->getType() == "identifier"){
-            ParseTree* temp2 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
-            compileClassVarDec->addChild(temp2);
-            tokenList.erase(tokenList.begin());
-    }
-    else{
-        throw ParseException(); //parseError
-    }
-
-    //add varName
-    if(tokenList.front()->getType() == "identifier"){
-            ParseTree* temp3 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
-            compileClassVarDec->addChild(temp3);
-            tokenList.erase(tokenList.begin());
-    }
-    else{
-        throw ParseException(); //parseError
-    }
-
-    //add (','varName)*
-    while(tokenList.front()->getValue() != ";" && (tokenList.size() > 0)){
-
-        //(','varName)*
-        if( tokenList.front()->getType() == "symbol" && tokenList.front()->getValue() == ","
-            && tokenList.front()->getType() == "identifier"){
-            compileClassVarDec->addChild(compileClassVarDec());
-        }
-        else if(tokenList.front()->getType() != "symbol" && tokenList.front()->getValue() != ";"){
-            throw ParseException();
-        }
-    }
-
-    //add ';'
-    if(tokenList.front()->getType() == "symbol" && tokenList.front()->getValue() == ";"){
-            ParseTree* temp4 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
-            compileClassVarDec->addChild(temp4);
-            tokenList.erase(tokenList.begin());
-    }
-    else{
-        throw ParseException(); //parseError
-    }
-    return compileClassVarDec;
+    return NULL;
 }
 
 /**
@@ -159,100 +37,7 @@ ParseTree* CompilerParser::compileClassVarDec() {
  * @return a ParseTree
  */
 ParseTree* CompilerParser::compileSubroutine() {
-    ParseTree* compileSubroutine = new ParseTree("compileSubroutine","");
-        //add 'constructor' | 'function' | 'method'
-    if( tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "constructor" 
-    || tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "function" 
-    || tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "method" ){
-            ParseTree* temp1 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
-            compileSubroutine->addChild(temp1);
-            tokenList.erase(tokenList.begin());
-    }
-    else{
-        throw ParseException(); //parseError
-    }
-
-    //add void | type
-    if( tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "void" 
-
-    || tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "int" 
-    || tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "char" 
-    || tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "boolean" 
-    || tokenList.front()->getType() == "identifier"){
-            ParseTree* temp2 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
-            compileSubroutine->addChild(temp2);
-            tokenList.erase(tokenList.begin());
-    }
-    else{
-        throw ParseException(); //parseError
-    }
-
-    //add subRoutineName
-    if(tokenList.front()->getType() == "identifier"){
-            ParseTree* temp3 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
-            compileSubroutine->addChild(temp3);
-            tokenList.erase(tokenList.begin());
-    }
-    else{
-        throw ParseException(); //parseError
-    }
-
-    //add '('
-    if(tokenList.front()->getType() == "symbol" && tokenList.front()->getValue() == "("){
-            ParseTree* temp4 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
-            compileSubroutine->addChild(temp4);
-            tokenList.erase(tokenList.begin());
-    }
-    else{
-        throw ParseException(); //parseError
-    }
-
-    //add parameterList
-
-    //add type varName
-    if((tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "int" 
-    || tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "char" 
-    || tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "boolean" 
-    || tokenList.front()->getType() == "identifier")
-    
-    && tokenList.front()->getType() == "identifier"){
-            ParseTree* temp5 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
-            compileSubroutine->addChild(temp5);
-            tokenList.erase(tokenList.begin());
-    }
-    else{
-        throw ParseException(); //parseError
-    }
-
-    //add ()',' type varName)*
-    while(tokenList.front()->getValue() != (tokenList.front()->getType() == "stringConstant") && (tokenList.size() > 0)){
-
-        //(','varName)*
-        if( tokenList.front()->getType() == "symbol" && tokenList.front()->getValue() == ","
-            && (tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "int" 
-            || tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "char" 
-            || tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "boolean" 
-            || tokenList.front()->getType() == "identifier")
-            && (tokenList.front()->getType() == "identifier")) {
-            compileClass->addChild(compileSubroutine());
-        }
-        else if(tokenList.front()->getType() != "symbol" && tokenList.front()->getValue() != ","){
-            throw ParseException();
-        }
-    }
-
-    //add ?
-
-    if(tokenList.front()->getType() == "stringConstant"){
-        ParseTree* temp6 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
-        compileSubroutine->addChild(temp6);
-        tokenList.erase(tokenList.begin());
-    }
-    else{
-        throw ParseException(); //parseError
-    }
-
-    return compileSubroutine;
+    return NULL;
 }
 
 /**
@@ -335,8 +120,6 @@ ParseTree* CompilerParser::compileVarDec() {
     else{
         throw ParseException(); //parseError
     }
- 
-
 }
 
 /**
