@@ -100,6 +100,10 @@ ParseTree* CompilerParser::compileVarDec() {
 
     while( tokenList.front()->getType() != "symbol" && tokenList.front()->getValue() != ";" ){
 
+        if(tokenList.size() <= 1){
+            break;
+        }
+
         if( tokenList.front()->getType() == "symbol" && tokenList.front()->getValue() == ","
             || tokenList.front()->getType() == "identifier"){
                 ParseTree* temp4 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
