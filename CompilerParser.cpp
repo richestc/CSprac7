@@ -74,10 +74,10 @@ ParseTree* CompilerParser::compileVarDec() {
     }
 
     //type
-    if( tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "int" 
-    || tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "char" 
-    || tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "boolean" 
-    || tokenList.front()->getType() == "identifier"){
+    if( (tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "int") 
+    || (tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "char") 
+    || (tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "boolean") 
+    || (tokenList.front()->getType() == "identifier")){
             ParseTree* temp2 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
             compileVarDec->addChild(temp2);
             tokenList.erase(tokenList.begin());
@@ -104,8 +104,8 @@ ParseTree* CompilerParser::compileVarDec() {
             break;
         }
 
-        if( tokenList.front()->getType() == "symbol" && tokenList.front()->getValue() == ","
-            || tokenList.front()->getType() == "identifier"){
+        if( (tokenList.front()->getType() == "symbol" && tokenList.front()->getValue() == ",")
+            || (tokenList.front()->getType() == "identifier") ){
                 ParseTree* temp4 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
                 compileVarDec->addChild(temp4);
                 tokenList.erase(tokenList.begin());
@@ -124,6 +124,8 @@ ParseTree* CompilerParser::compileVarDec() {
     else{
         throw ParseException(); //parseError
     }
+
+    return compileVarDec;
 }
 
 /**
