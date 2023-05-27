@@ -28,20 +28,18 @@ int main(int argc, char *argv[]) {
         cout << "Error Parsing!" << endl;
     }
 
-    //subroutine test
-    tokens.push_back(new Token("keyword","function"));
-    tokens.push_back(new Token("keyword","void"));
-    tokens.push_back(new Token("identifier","myFunc"));
-    tokens.push_back(new Token("symbol","{"));
-    tokens.push_back(new Token("keyword","var"));
-    tokens.push_back(new Token("keyword","int"));
-    tokens.push_back(new Token("identifier","a"));
-    tokens.push_back(new Token("symbol",";"));
-    tokens.push_back(new Token("keyword","let"));
-    tokens.push_back(new Token("identifier","a"));
-    tokens.push_back(new Token("symbol","="));
-    tokens.push_back(new Token("integerConstant","1"));
-    tokens.push_back(new Token("symbol",";"));
-    tokens.push_back(new Token("symbol","}"));
-    
+    //CMPClass test
+    //list<Token*> CMPClass;
+    //CMPClass.push_back(new Token("keyword", "class"));
+    //CMPClass.push_back(new Token("identifier", "MyClass"));
+    //CMPClass.push_back(new Token("symbol", "{"));
+    //CMPClass.push_back(new Token("symbol", "}"));
+
+    //CMPVarDec test
+    //list<Token*> CMPVarDec;
+    //CMPVarDec.push_back(new Token("keyword", "var"));
+    //CMPVarDec.push_back(new Token("keyword", "int"));
+    //CMPVarDec.push_back(new Token("identifier", "a"));
+    //CMPVarDec.push_back(new Token("symbol", ";"));
+
 }

@@ -21,7 +21,78 @@ ParseTree* CompilerParser::compileProgram() {
  * @return a ParseTree
  */
 ParseTree* CompilerParser::compileClass() {
-    return NULL;
+    ParseTree* CMPClass = new ParseTree("CMPClass","");
+
+    //class
+    if(tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "class"){
+            ParseTree* temp1 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
+            CMPClass->addChild(temp1);
+            tokenList.erase(tokenList.begin());
+    }
+    else{
+        throw ParseException(); //parseError
+    }
+
+    //className
+    if( tokenList.front()->getType() == "identifier"){
+            ParseTree* temp2 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
+            CMPClass->addChild(temp2);
+            tokenList.erase(tokenList.begin());
+    }
+    else{
+        throw ParseException(); //parseError
+    }
+    
+    //{
+    if( tokenList.front()->getType() == "symbol" && tokenList.front()->getValue() == "{"){
+            ParseTree* temp3 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
+            CMPClass->addChild(temp3);
+            tokenList.erase(tokenList.begin());
+    }
+    else{
+        throw ParseException(); //parseError
+    }
+
+    // (classVarDec)* (subroutineDec)*
+    while( tokenList.front()->getType() != "symbol" && tokenList.front()->getValue() != "}" ){
+
+        if(tokenList.size() <= 1){
+            break;
+        }
+
+        if( (tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "static") 
+            || (tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "field") ){
+
+            CMPClass->addChild( compileClassVarDec() );
+
+        }
+        else if( (tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "constructor") 
+            || (tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "function")
+            || (tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "method") ){
+
+            CMPClass->addChild( compileSubroutine() );
+        }
+
+        else if(tokenList.front()->getType() != "symbol" && tokenList.front()->getValue() != "}"){
+            //throw std::invalid_argument( "Error in parsing: 04" + tIn.front()->getType() + "  " + tIn.front()->getValue());
+            throw ParseException();
+        }     
+        else{
+            throw ParseException(); //parseError
+        }
+    }
+
+    //}
+    if( tokenList.front()->getType() == "symbol" && tokenList.front()->getValue() == "}"){
+            ParseTree* temp4 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
+            CMPClass->addChild(temp4);
+            tokenList.erase(tokenList.begin());
+    }
+    else{
+        throw ParseException(); //parseError
+    }
+
+    return CMPClass;
 }
 
 /**
@@ -29,6 +100,15 @@ ParseTree* CompilerParser::compileClass() {
  * @return a ParseTree
  */
 ParseTree* CompilerParser::compileClassVarDec() {
+
+    //ParseTree* CMPClassVarDec = new ParseTree("CMPClassVarDec","");
+
+    //static or field 
+    //CMPClassVarDec->addChild(tokenList.front()->getType(), tokenList.front()->getValue() );
+    //tokenList.next();
+
+    //type
+
     return NULL;
 }
 
