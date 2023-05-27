@@ -64,7 +64,7 @@ ParseTree* CompilerParser::compileVarDec() {
     ParseTree* compileVarDec = new ParseTree("compileVarName","");
 
     //var
-    if(tokenList.front()->getType() == "keyword" && token.front()->getValue() = "var"){
+    if(tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "var"){
             ParseTree* temp1 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
             compileVarDec->addChild(temp1);
             tokenList.erase(tokenList.begin());
