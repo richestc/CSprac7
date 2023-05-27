@@ -61,12 +61,12 @@ ParseTree* CompilerParser::compileSubroutineBody() {
  * @return a ParseTree
  */
 ParseTree* CompilerParser::compileVarDec() {
-    ParseTree* compileVarDec = new ParseTree("compileVarName","");
+    ParseTree* CMPVarDec = new ParseTree("CMPVarDec","");
 
     //var
     if(tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "var"){
             ParseTree* temp1 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
-            compileVarDec->addChild(temp1);
+            CMPVarDec->addChild(temp1);
             tokenList.erase(tokenList.begin());
     }
     else{
@@ -79,7 +79,7 @@ ParseTree* CompilerParser::compileVarDec() {
     || (tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "boolean") 
     || (tokenList.front()->getType() == "identifier")){
             ParseTree* temp2 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
-            compileVarDec->addChild(temp2);
+            CMPVarDec->addChild(temp2);
             tokenList.erase(tokenList.begin());
     }
     else{
@@ -89,7 +89,7 @@ ParseTree* CompilerParser::compileVarDec() {
     //varName
     if( tokenList.front()->getType() == "identifier"){
             ParseTree* temp3 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
-            compileVarDec->addChild(temp3);
+            CMPVarDec->addChild(temp3);
             tokenList.erase(tokenList.begin());
     }
     else{
@@ -107,7 +107,7 @@ ParseTree* CompilerParser::compileVarDec() {
         if( (tokenList.front()->getType() == "symbol" && tokenList.front()->getValue() == ",")
             || (tokenList.front()->getType() == "identifier") ){
                 ParseTree* temp4 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
-                compileVarDec->addChild(temp4);
+                CMPVarDec->addChild(temp4);
                 tokenList.erase(tokenList.begin());
         }
         else{
@@ -118,14 +118,14 @@ ParseTree* CompilerParser::compileVarDec() {
     //;
     if( tokenList.front()->getType() == "symbol" && tokenList.front()->getValue() == ";"){
             ParseTree* temp5 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
-            compileVarDec->addChild(temp5);
+            CMPVarDec->addChild(temp5);
             tokenList.erase(tokenList.begin());
     }
     else{
         throw ParseException(); //parseError
     }
 
-    return compileVarDec;
+    return CMPVarDec;
 }
 
 /**
