@@ -101,15 +101,66 @@ ParseTree* CompilerParser::compileClass() {
  */
 ParseTree* CompilerParser::compileClassVarDec() {
 
-    //ParseTree* CMPClassVarDec = new ParseTree("CMPClassVarDec","");
+    ParseTree* CMPClassVarDec = new ParseTree("CMPClassVarDec","");
 
     //static or field 
-    //CMPClassVarDec->addChild(tokenList.front()->getType(), tokenList.front()->getValue() );
-    //tokenList.next();
+    ParseTree* temp1 = new ParseTree(tokenList.front()->getType(), tokenList.front()->getValue());
+    CMPClassVarDec->addChild(temp1);
+    tokenList.erase(tokenList.begin());
+    //tokenList.next(); ???
 
     //type
+    if( (tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "int") 
+    || (tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "char") 
+    || (tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "boolean") 
+    || (tokenList.front()->getType() == "identifier")){
+            ParseTree* temp2 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
+            CMPClassVarDec->addChild(temp2);
+            tokenList.erase(tokenList.begin());
+    }
+    else{
+        throw ParseException(); //parseError
+    }
 
-    return NULL;
+    //varName
+    if( tokenList.front()->getType() == "identifier"){
+            ParseTree* temp3 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
+            CMPClassVarDec->addChild(temp3);
+            tokenList.erase(tokenList.begin());
+    }
+    else{
+        throw ParseException(); //parseError
+    }    
+
+    //(','varName)*
+    while( tokenList.front()->getType() != "symbol" && tokenList.front()->getValue() != ";" ){
+
+        if(tokenList.size() <= 1){
+            break;
+        }
+
+        if( (tokenList.front()->getType() == "symbol" && tokenList.front()->getValue() == ",")
+            || (tokenList.front()->getType() == "identifier") ){
+                ParseTree* temp4 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
+                CMPClassVarDec->addChild(temp4);
+                tokenList.erase(tokenList.begin());
+        }
+        else{
+            throw ParseException(); //parseError
+        }
+    }
+
+    //;
+    if( tokenList.front()->getType() == "symbol" && tokenList.front()->getValue() == ";"){
+            ParseTree* temp5 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
+            CMPClassVarDec->addChild(temp5);
+            tokenList.erase(tokenList.begin());
+    }
+    else{
+        throw ParseException(); //parseError
+    }
+
+    return CMPClassVarDec;
 }
 
 /**
@@ -117,7 +168,78 @@ ParseTree* CompilerParser::compileClassVarDec() {
  * @return a ParseTree
  */
 ParseTree* CompilerParser::compileSubroutine() {
-    return NULL;
+    ParseTree* CMPSubroutine = new ParseTree("CMPSubroutine","");
+
+    //constructor/function/method
+    ParseTree* temp1 = new ParseTree(tokenList.front()->getType(), tokenList.front()->getValue());
+    CMPSubroutine->addChild(temp1);
+    tokenList.erase(tokenList.begin());
+
+    //void/type
+    if( (tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "void") ||
+     ((tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "int") 
+    || (tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "char") 
+    || (tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "boolean") 
+    || (tokenList.front()->getType() == "identifier")) ){
+            ParseTree* temp3 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
+            CMPSubroutine->addChild(temp3);
+            tokenList.erase(tokenList.begin());
+    }
+    else{
+        throw ParseException(); //parseError
+    }
+
+    //subroutineName
+    if( (tokenList.front()->getType() == "identifier") ){
+            ParseTree* temp4 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
+            CMPSubroutine->addChild(temp4);
+            tokenList.erase(tokenList.begin());
+    }
+    else{
+        throw ParseException(); //parseError
+    }
+
+    //(
+    if( tokenList.front()->getType() == "symbol" && tokenList.front()->getValue() == "(" ){
+            ParseTree* temp5 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
+            CMPSubroutine->addChild(temp5);
+            tokenList.erase(tokenList.begin());
+    }
+    else{
+        throw ParseException(); //parseError
+    }
+
+    //parameterList
+    if( ((tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "int") 
+    || (tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "char") 
+    || (tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "boolean") 
+    || (tokenList.front()->getType() == "identifier"))  ||
+    ((tokenList.front()->getType() == "identifier")) ){
+            CMPSubroutine->addChild( compileParameterList() );
+    }
+    else{
+        throw ParseException(); //parseError
+    }
+    
+    //)
+    if( tokenList.front()->getType() == "symbol" && tokenList.front()->getValue() == ")" ){
+            ParseTree* temp6 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
+            CMPSubroutine->addChild(temp6);
+            tokenList.erase(tokenList.begin());
+    }
+    else{
+        throw ParseException(); //parseError
+    }
+
+    //subroutineBody
+    if( tokenList.front()->getType() == "symbol" && tokenList.front()->getValue() == "{" ){
+            CMPSubroutine->addChild( compileSubroutineBody() );
+    }
+    else{
+        throw ParseException(); //parseError
+    }
+    
+    return CMPSubroutine;
 }
 
 /**
@@ -125,7 +247,47 @@ ParseTree* CompilerParser::compileSubroutine() {
  * @return a ParseTree
  */
 ParseTree* CompilerParser::compileParameterList() {
-    return NULL;
+    ParseTree* CMPParameterList = new ParseTree("CMPParameterList","");
+
+    //(type varName)
+    ParseTree* temp1 = new ParseTree(tokenList.front()->getType(), tokenList.front()->getValue());
+    CMPParameterList->addChild(temp1);
+    tokenList.erase(tokenList.begin());
+
+    //(',' type varName)*?
+    while( !tokenList.empty() ){
+
+        if(tokenList.size() <= 1){
+            break;
+        }
+
+        if( (tokenList.front()->getType() == "symbol" && tokenList.front()->getValue() == ",") ||
+        ((tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "int") 
+        || (tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "char") 
+        || (tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "boolean") 
+        || (tokenList.front()->getType() == "identifier")) ||
+        ((tokenList.front()->getType() == "identifier")) ){
+                ParseTree* temp2 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
+                CMPParameterList->addChild(temp2);
+                tokenList.erase(tokenList.begin());
+        }
+        else{
+            throw ParseException(); //parseError
+        }
+
+    //?
+    if( tokenList.front()->getType() == "stringConstant" && tokenList.front()->getValue() == "?" ){
+            ParseTree* temp3 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
+            CMPParameterList->addChild(temp3);
+            tokenList.erase(tokenList.begin());
+    }
+    else{
+        throw ParseException(); //parseError
+    }
+    
+    }
+
+    return CMPParameterList;
 }
 
 /**
@@ -133,7 +295,51 @@ ParseTree* CompilerParser::compileParameterList() {
  * @return a ParseTree
  */
 ParseTree* CompilerParser::compileSubroutineBody() {
-    return NULL;
+    ParseTree* CMPSubroutineBody = new ParseTree("CMPSubroutineBody","");
+
+    //{
+    ParseTree* temp1 = new ParseTree(tokenList.front()->getType(), tokenList.front()->getValue());
+    CMPSubroutineBody->addChild(temp1);
+    tokenList.erase(tokenList.begin());
+
+    //varDec*
+    while( tokenList.front()->getType() != "symbol" && tokenList.front()->getValue() != "}" ){
+
+        if(tokenList.size() <= 1){
+            break;
+        }
+
+        if( tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "var" ){
+                CMPSubroutineBody->addChild( compileVarDec() );
+        }
+        else{
+            throw ParseException(); //parseError
+        }
+    }
+
+    //statements
+    if( (tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "let")
+        || (tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "if")
+        || (tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "while")
+        || (tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "do")
+        || (tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "return") ){
+            CMPSubroutineBody->addChild( compileStatements() );
+    }
+    else{
+        throw ParseException(); //parseError
+    }
+
+    //}
+    if(tokenList.front()->getType() == "symbol" && tokenList.front()->getValue() == "}"){
+            ParseTree* temp2 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
+            CMPSubroutineBody->addChild(temp2);
+            tokenList.erase(tokenList.begin());
+    }
+    else{
+        throw ParseException(); //parseError
+    }
+
+    return CMPSubroutineBody;
 }
 
 /**
@@ -177,7 +383,6 @@ ParseTree* CompilerParser::compileVarDec() {
     }
 
     //(','varName)*
-
     while( tokenList.front()->getType() != "symbol" && tokenList.front()->getValue() != ";" ){
 
         if(tokenList.size() <= 1){
@@ -213,7 +418,54 @@ ParseTree* CompilerParser::compileVarDec() {
  * @return a ParseTree
  */
 ParseTree* CompilerParser::compileStatements() {
-    return NULL;
+    ParseTree* CMPStatements = new ParseTree("CMPStatements","");
+
+    //
+    ParseTree* temp1 = new ParseTree(tokenList.front()->getType(), tokenList.front()->getValue());
+    CMPStatements->addChild(temp1);
+    tokenList.erase(tokenList.begin());
+
+    //letStatement
+    if( tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "let"){
+            CMPStatements->addChild( compileLet() );
+    }
+    else{
+        throw ParseException(); //parseError
+    }
+
+    //ifStatement
+    if( tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "if"){
+            CMPStatements->addChild( compileIf() );
+    }
+    else{
+        throw ParseException(); //parseError
+    }
+
+    //whileStatement
+    if( tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "while"){
+            CMPStatements->addChild( compileWhile() );
+    }
+    else{
+        throw ParseException(); //parseError
+    }
+
+    //doStatement
+    if( tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "do"){
+            CMPStatements->addChild( compileDo() );
+    }
+    else{
+        throw ParseException(); //parseError
+    }
+
+    //returnStatement
+    if( tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "return"){
+            CMPStatements->addChild( compileReturn() );
+    }
+    else{
+        throw ParseException(); //parseError
+    }
+
+    return CMPStatements;
 }
 
 /**
@@ -221,7 +473,81 @@ ParseTree* CompilerParser::compileStatements() {
  * @return a ParseTree
  */
 ParseTree* CompilerParser::compileLet() {
-    return NULL;
+    ParseTree* CMPLet = new ParseTree("CMPLet","");
+
+    //let
+    ParseTree* temp1 = new ParseTree(tokenList.front()->getType(), tokenList.front()->getValue());
+    CMPLet->addChild(temp1);
+    tokenList.erase(tokenList.begin());
+
+    //varName
+    if( tokenList.front()->getType() == "identifier"){
+            ParseTree* temp2 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
+            CMPLet->addChild(temp2);
+            tokenList.erase(tokenList.begin());
+    }
+    else{
+        throw ParseException(); //parseError
+    }
+
+    //[
+    if( tokenList.front()->getType() == "symbol" && tokenList.front()->getValue() == "[" ){
+            ParseTree* temp2 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
+            CMPLet->addChild(temp2);
+            tokenList.erase(tokenList.begin());
+    }
+    else{
+        throw ParseException(); //parseError
+    }
+
+    //expression
+    if( tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "skip" ){
+            CMPLet->addChild( compileExpression() );
+    }
+    else{
+        throw ParseException(); //parseError
+    }
+
+    //]
+    if( tokenList.front()->getType() == "symbol" && tokenList.front()->getValue() == "]" ){
+            ParseTree* temp3 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
+            CMPLet->addChild(temp3);
+            tokenList.erase(tokenList.begin());
+    }
+    else{
+        throw ParseException(); //parseError
+    }
+
+    //=
+    if( tokenList.front()->getType() == "symbol" && tokenList.front()->getValue() == "=" ){
+            ParseTree* temp4 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
+            CMPLet->addChild(temp4);
+            tokenList.erase(tokenList.begin());
+    }
+    else{
+        throw ParseException(); //parseError
+    }
+
+    //expression
+    if( tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "skip" ){
+            CMPLet->addChild( compileExpression() );
+    }
+    else{
+        throw ParseException(); //parseError
+    }
+
+    //;
+    if( tokenList.front()->getType() == "symbol" && tokenList.front()->getValue() == ";" ){
+            ParseTree* temp5 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
+            CMPLet->addChild(temp5);
+            tokenList.erase(tokenList.begin());
+    }
+    else{
+        throw ParseException(); //parseError
+    }
+
+
+    return CMPLet;
 }
 
 /**
@@ -229,7 +555,127 @@ ParseTree* CompilerParser::compileLet() {
  * @return a ParseTree
  */
 ParseTree* CompilerParser::compileIf() {
-    return NULL;
+    ParseTree* CMPIf = new ParseTree("CMPIf","");
+
+    //if
+    ParseTree* temp1 = new ParseTree(tokenList.front()->getType(), tokenList.front()->getValue());
+    CMPIf->addChild(temp1);
+    tokenList.erase(tokenList.begin());
+
+    //(
+    if( tokenList.front()->getType() == "symbol" && tokenList.front()->getValue() == "(" ){
+            ParseTree* temp2 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
+            CMPIf->addChild(temp2);
+            tokenList.erase(tokenList.begin());
+    }
+    else{
+        throw ParseException(); //parseError
+    }
+
+    //expression
+    if( tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "skip" ){
+            CMPIf->addChild( compileExpression() );
+    }
+    else{
+        throw ParseException(); //parseError
+    }
+
+    //)
+    if( tokenList.front()->getType() == "symbol" && tokenList.front()->getValue() == ")" ){
+            ParseTree* temp3 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
+            CMPIf->addChild(temp3);
+            tokenList.erase(tokenList.begin());
+    }
+    else{
+        throw ParseException(); //parseError
+    }
+
+    //{
+    if( tokenList.front()->getType() == "symbol" && tokenList.front()->getValue() == "{" ){
+            ParseTree* temp4 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
+            CMPIf->addChild(temp4);
+            tokenList.erase(tokenList.begin());
+    }
+    else{
+        throw ParseException(); //parseError
+    }
+
+    //statements
+    if( (tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "let")
+        || (tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "if")
+        || (tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "while")
+        || (tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "do")
+        || (tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "return") ){
+            CMPIf->addChild( compileStatements() );
+    }
+    else{
+        throw ParseException(); //parseError
+    }
+
+
+    //}
+    if( tokenList.front()->getType() == "symbol" && tokenList.front()->getValue() == "}" ){
+            ParseTree* temp5 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
+            CMPIf->addChild(temp5);
+            tokenList.erase(tokenList.begin());
+    }
+    else{
+        throw ParseException(); //parseError
+    }
+
+    //(
+    if( tokenList.front()->getType() == "symbol" && tokenList.front()->getValue() == "(" ){
+            ParseTree* temp6 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
+            CMPIf->addChild(temp6);
+            tokenList.erase(tokenList.begin());
+    }
+    else{
+        throw ParseException(); //parseError
+    }
+
+    //else
+    if( tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "else" ){
+            ParseTree* temp7 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
+            CMPIf->addChild(temp7);
+            tokenList.erase(tokenList.begin());
+    }
+    else{
+        throw ParseException(); //parseError
+    }
+
+    //{
+    if( tokenList.front()->getType() == "symbol" && tokenList.front()->getValue() == "{" ){
+            ParseTree* temp8 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
+            CMPIf->addChild(temp8);
+            tokenList.erase(tokenList.begin());
+    }
+    else{
+        throw ParseException(); //parseError
+    }
+
+    //statements
+    if( (tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "let")
+        || (tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "if")
+        || (tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "while")
+        || (tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "do")
+        || (tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "return") ){
+            CMPIf->addChild( compileStatements() );
+    }
+    else{
+        throw ParseException(); //parseError
+    }
+
+    //}
+    if( tokenList.front()->getType() == "symbol" && tokenList.front()->getValue() == "}" ){
+            ParseTree* temp9 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
+            CMPIf->addChild(temp9);
+            tokenList.erase(tokenList.begin());
+    }
+    else{
+        throw ParseException(); //parseError
+    }
+
+    return CMPIf;
 }
 
 /**
@@ -237,7 +683,74 @@ ParseTree* CompilerParser::compileIf() {
  * @return a ParseTree
  */
 ParseTree* CompilerParser::compileWhile() {
-    return NULL;
+    ParseTree* CMPWhile = new ParseTree("CMPWhile","");
+
+    //while
+    ParseTree* temp1 = new ParseTree(tokenList.front()->getType(), tokenList.front()->getValue());
+    CMPWhile->addChild(temp1);
+    tokenList.erase(tokenList.begin());
+
+    //(
+    if( tokenList.front()->getType() == "symbol" && tokenList.front()->getValue() == "(" ){
+            ParseTree* temp2 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
+            CMPWhile->addChild(temp2);
+            tokenList.erase(tokenList.begin());
+    }
+    else{
+        throw ParseException(); //parseError
+    }
+
+    //expression
+    if( tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "skip" ){
+            CMPWhile->addChild( compileExpression() );
+    }
+    else{
+        throw ParseException(); //parseError
+    }
+
+    //)
+    if( tokenList.front()->getType() == "symbol" && tokenList.front()->getValue() == ")" ){
+            ParseTree* temp3 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
+            CMPWhile->addChild(temp3);
+            tokenList.erase(tokenList.begin());
+    }
+    else{
+        throw ParseException(); //parseError
+    }
+
+    //{
+    if( tokenList.front()->getType() == "symbol" && tokenList.front()->getValue() == "{" ){
+            ParseTree* temp4 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
+            CMPWhile->addChild(temp4);
+            tokenList.erase(tokenList.begin());
+    }
+    else{
+        throw ParseException(); //parseError
+    }
+
+    //statement
+    if( (tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "let")
+        || (tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "if")
+        || (tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "while")
+        || (tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "do")
+        || (tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "return") ){
+            CMPWhile->addChild( compileStatements() );
+    }
+    else{
+        throw ParseException(); //parseError
+    }
+
+    //}
+    if( tokenList.front()->getType() == "symbol" && tokenList.front()->getValue() == "}" ){
+            ParseTree* temp5 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
+            CMPWhile->addChild(temp5);
+            tokenList.erase(tokenList.begin());
+    }
+    else{
+        throw ParseException(); //parseError
+    }
+
+    return CMPWhile;
 }
 
 /**
@@ -245,15 +758,62 @@ ParseTree* CompilerParser::compileWhile() {
  * @return a ParseTree
  */
 ParseTree* CompilerParser::compileDo() {
-    return NULL;
+    ParseTree* CMPDo = new ParseTree("CMPDo","");
+
+    //do
+    ParseTree* temp1 = new ParseTree(tokenList.front()->getType(), tokenList.front()->getValue());
+    CMPDo->addChild(temp1);
+    tokenList.erase(tokenList.begin());
+
+    //expression
+    if( tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "skip" ){
+            CMPDo->addChild( compileExpression() );
+    }
+    else{
+        throw ParseException(); //parseError
+    }
+
+    //;
+    if( tokenList.front()->getType() == "symbol" && tokenList.front()->getValue() == ";" ){
+            CMPDo->addChild( compileExpression() );
+    }
+    else{
+        throw ParseException(); //parseError
+    }
+
+    return CMPDo;
 }
+
 
 /**
  * Generates a parse tree for a return statement
  * @return a ParseTree
  */
 ParseTree* CompilerParser::compileReturn() {
-    return NULL;
+    ParseTree* CMPReturn = new ParseTree("CMPReturn","");
+
+    //return
+    ParseTree* temp1 = new ParseTree(tokenList.front()->getType(), tokenList.front()->getValue());
+    CMPReturn->addChild(temp1);
+    tokenList.erase(tokenList.begin());
+
+    //expression
+    if( tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "skip" ){
+            CMPReturn->addChild( compileExpression() );
+    }
+    else{
+        throw ParseException(); //parseError
+    }
+
+    //;
+    if( tokenList.front()->getType() == "symbol" && tokenList.front()->getValue() == ";" ){
+            CMPReturn->addChild( compileExpression() );
+    }
+    else{
+        throw ParseException(); //parseError
+    }
+
+    return CMPReturn;
 }
 
 /**
@@ -277,7 +837,39 @@ ParseTree* CompilerParser::compileTerm() {
  * @return a ParseTree
  */
 ParseTree* CompilerParser::compileExpressionList() {
-    return NULL;
+    ParseTree* CMPExpressionList = new ParseTree("CMPExpressionList","");
+
+    //expression
+    if( tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "skip" ){
+            CMPExpressionList->addChild( compileExpression() );
+    }
+    else{
+        throw ParseException(); //parseError
+    }
+
+    //(',')expression
+    while( tokenList.front()->getType() != "symbol" && tokenList.front()->getValue() != ";" ){
+
+    if(tokenList.size() <= 1){
+            break;
+    }
+
+    if( tokenList.front()->getType() == "symbol" && tokenList.front()->getValue() == "," ){
+            ParseTree* temp1 = new ParseTree(tokenList.front()->getType(),tokenList.front()->getValue());
+            CMPExpressionList->addChild(temp1);
+            tokenList.erase(tokenList.begin());
+    }
+    else if( tokenList.front()->getType() == "keyword" && tokenList.front()->getValue() == "skip" ){
+            CMPExpressionList->addChild( compileExpression() );
+    }
+    else{
+        throw ParseException(); //parseError
+    }
+
+    }
+
+
+    return CMPExpressionList;
 }
 
 /**
